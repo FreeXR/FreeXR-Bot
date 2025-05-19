@@ -7,7 +7,7 @@ import asyncio
 import json
 from pathlib import Path
 import re
-import datetime
+from datetime import datetime, timezone
 import os
 import requests
 import time
@@ -515,7 +515,7 @@ active_quarantines = {}
 
 def log_to_file(entry: str):
     with open(LOG_FILE, "a", encoding="utf-8") as f:
-        f.write(f"{datetime.utcnow().isoformat()} - {entry}\n")
+        f.write(f"{datetime.now(timezone.utc).isoformat()} - {entry}\n")
 
 def save_quarantine_data():
     with open(QUARANTINE_DATA_FILE, "w", encoding="utf-8") as f:
@@ -566,7 +566,7 @@ async def q(ctx, member: discord.Member, duration: str, *, reason: str = "No rea
         return
 
     await member.add_roles(quarantine_role, reason=f"Quarantine by {ctx.author} for {reason}")
-    unquarantine_time = datetime.utcnow() + delta
+    unquarantine_time = datetime.now(timezone.utc) + delta
     active_quarantines[str(member.id)] = unquarantine_time.isoformat()
     save_quarantine_data()
 
@@ -614,7 +614,7 @@ async def uq(ctx, member: discord.Member, *, reason: str = "No reason provided")
 
 @tasks.loop(seconds=60)
 async def check_quarantine_expiry():
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     guild = bot.guilds[0]
     quarantine_role = guild.get_role(QUARANTINE_ROLE_ID)
     to_remove = []
