@@ -167,7 +167,7 @@ RAW_URL = "https://raw.githubusercontent.com/FreeXR/FreeXR-Bot/refs/heads/main/a
 LOCAL_PATH = "/home/container/app.py" 
 
 
-@bot.command()
+@bot.hybrid_command()
 async def update(ctx):
     if not is_admin(ctx.author):
         return await ctx.send("❌ You are not authorized to update the bot.")
@@ -190,7 +190,7 @@ async def update(ctx):
     except Exception as e:
         await ctx.send(f"❌ Update failed:\n```{e}```")
    
-@bot.command()
+@bot.hybrid_command()
 async def role(ctx, role_id: int, user_id: int):
     allowed_user_id = 981463678698266664
 
@@ -220,7 +220,7 @@ async def role(ctx, role_id: int, user_id: int):
         await ctx.send("❌ I don't have permission to manage that role.")
     except discord.HTTPException as e:
         await ctx.send(f"❌ Failed to modify role: {e}")
-@bot.command()
+@bot.hybrid_command()
 async def pin(ctx):
     if not ctx.message.reference:
         await ctx.send("Please reply to the message you want to pin.")
@@ -235,7 +235,7 @@ async def pin(ctx):
     except discord.HTTPException as e:
         await ctx.send(f"Failed to pin message: {e}")
 
-@bot.command()
+@bot.hybrid_command()
 async def unpin(ctx):
     if not ctx.message.reference:
         await ctx.send("Please reply to the message you want to unpin.")
@@ -250,7 +250,7 @@ async def unpin(ctx):
     except discord.HTTPException as e:
         await ctx.send(f"Failed to unpin message: {e}")
 
-@bot.command()
+@bot.hybrid_command()
 async def report(ctx):
     if not isinstance(ctx.channel, discord.DMChannel):
         await ctx.send("Please DM me this command.")
@@ -295,7 +295,7 @@ async def add_to_report(interaction: discord.Interaction, message: discord.Messa
 
     await interaction.response.send_message("✅ Message added to your report.", ephemeral=True)
     
-@bot.command()
+@bot.hybrid_command()
 async def iamdone(ctx):
     if not isinstance(ctx.channel, discord.DMChannel):
         return
@@ -337,7 +337,7 @@ async def iamdone(ctx):
 
 
 
-@bot.command()
+@bot.hybrid_command()
 @commands.has_role(ADMIN_ROLE_ID)
 async def resolve(ctx, msg_id: int = None):
     # Try to get message ID from reply if not given
@@ -364,7 +364,7 @@ async def resolve(ctx, msg_id: int = None):
         await ctx.send("That message isn't tracked as an active report.")
 
 
-@bot.command()
+@bot.hybrid_command()
 @commands.has_role(ADMIN_ROLE_ID)
 async def createchannel(ctx, msg_id: int = None):
     # Fallback to reply if no ID provided
@@ -409,7 +409,7 @@ async def createchannel(ctx, msg_id: int = None):
         await ctx.send(f"Failed to create channel: {e}")
 
 
-@bot.command()
+@bot.hybrid_command()
 @commands.has_role(ADMIN_ROLE_ID)
 async def createchannelp(ctx, msg_id: int = None):
     if not msg_id and ctx.message.reference:
@@ -452,7 +452,7 @@ async def createchannelp(ctx, msg_id: int = None):
     except Exception as e:
         await ctx.send(f"Failed to create channel: {e}")
 
-@bot.command()
+@bot.hybrid_command()
 @commands.has_role(ADMIN_ROLE_ID)
 async def listreport(ctx):
     if not report_log_map:
@@ -478,7 +478,7 @@ async def listreport(ctx):
 def is_admin(member):
     return any(role.id == ADMIN_ROLE_ID for role in member.roles)
 
-@bot.command()
+@bot.hybrid_command()
 async def block(ctx):
     if not is_admin(ctx.author):
         return await ctx.send("You don't have permission.")
@@ -500,7 +500,7 @@ async def block(ctx):
     except TimeoutError:
         await ctx.send("Timeout. Please try again.")
 
-@bot.command()
+@bot.hybrid_command()
 async def listregex(ctx):
     if not is_admin(ctx.author):
         return await ctx.send("You don't have permission.")
@@ -514,7 +514,7 @@ async def listregex(ctx):
     message += "\nUse `.toggle <index>` to enable/disable a regex."
     await ctx.send(message)
 
-@bot.command()
+@bot.hybrid_command()
 async def toggle(ctx, index: int):
     if not is_admin(ctx.author):
         return await ctx.send("You don't have permission.")
@@ -526,7 +526,7 @@ async def toggle(ctx, index: int):
     else:
         await ctx.send("Invalid index.")
 
-@bot.command()
+@bot.hybrid_command()
 async def unblock(ctx):
     if not is_admin(ctx.author):
         return await ctx.send("You don't have permission.")
@@ -588,7 +588,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-@bot.command()
+@bot.hybrid_command()
 async def status(ctx):
     os_info = platform.system()
     release = platform.release()
@@ -603,7 +603,7 @@ async def status(ctx):
 
     await ctx.send(env_message)
 
-@bot.command()
+@bot.hybrid_command()
 @bot.has_role(ADMIN_ROLE_ID)
 async def slowmode(ctx, seconds: int):
     await ctx.channel.edit(slowmode_delay=seconds)
@@ -639,7 +639,7 @@ def is_admin_quarantine():
 
 
 
-@bot.command()
+@bot.hybrid_command()
 @is_admin_quarantine()
 async def q(ctx, member: discord.Member, duration: str, *, reason: str = "No reason provided"):
     """
@@ -686,7 +686,7 @@ async def q(ctx, member: discord.Member, duration: str, *, reason: str = "No rea
         embed.add_field(name="Reason", value=reason, inline=False)
         await log_channel.send(embed=embed)
 
-@bot.command()
+@bot.hybrid_command()
 @is_admin_quarantine()
 async def uq(ctx, member: discord.Member, *, reason: str = "No reason provided"):
     """
@@ -749,7 +749,7 @@ async def check_quarantine_expiry():
     if to_remove:
         save_quarantine_data()
         
-@bot.command()
+@bot.hybrid_command()
 async def replies_cmd(ctx):
     if not replies:
         await ctx.send("⚠️ No replies available.")
@@ -758,7 +758,7 @@ async def replies_cmd(ctx):
     await ctx.send(f"```\n{response}\n```")
 
     
-@bot.command()
+@bot.hybrid_command()
 @commands.has_role(ADMIN_ROLE_ID)
 async def updatereplies(ctx):
     global replies
@@ -773,7 +773,7 @@ async def updatereplies(ctx):
     except Exception as e:
         await ctx.send(f"❌ Error updating replies: {e}")
         
-@bot.command()
+@bot.hybrid_command()
 async def ratelimitcheck(ctx):
     try:
         await ctx.send("Status message here")
@@ -847,7 +847,7 @@ async def on_message(message):
 
 
 
-@bot.command()
+@bot.hybrid_command()
 async def reboot(ctx):
     if not is_admin(ctx.author):
         return await ctx.send("❌ You are not authorized to reboot the bot.")
@@ -856,7 +856,7 @@ async def reboot(ctx):
     python = sys.executable
     os.execv(python, [python] + sys.argv)
 
-@bot.command()
+@bot.hybrid_command()
 async def streak(ctx):
     data = load_count_data()
     await ctx.send(f"The current counting streak is **{data['current_count']}**.")
